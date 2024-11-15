@@ -1,0 +1,135 @@
+{
+  "process_Info": {
+    "process_descr": "misDaily",
+    "source_system": "PartnerData",
+    "tenant_process": "mis-partner-stage",
+    "version": "1.0.0"
+  },
+  "feedEntities": {
+    "Partner_Info": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, s.MANDANT, s.EROEFFZTPKTPART, s.PARTKLS, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_partner_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, s.MANDANT, s.EROEFFZTPKTPART, s.PARTKLS, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_partner_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_partner_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Natural_Person": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, s.MANDANT, s.STANG, s.GEBDAT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_natural_partner_person_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, s.MANDANT, s.STANG, s.GEBDAT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_natural_partner_person_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_natural_person_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Org_Legal_Person": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, s.MANDANT, s.GRDGDAT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_organisation_legal_person_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, s.MANDANT, s.GRDGDAT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_organisation_legal_person_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_org_legl_person_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Post_Addr": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, h.ADRNR, s.LANDBEZGPOSTADR, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_postal_address_s` s, `rawvault_partnerdata.partner_postal_address_h` h WHERE h.MD_HKEY_POSTAL_ADDRESS_ID = s.MD_HKEY_POSTAL_ADDRESS_ID  AND s.ADRNR = 0 AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_POSTAL_ADDRESS_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, h.ADRNR, s.LANDBEZGPOSTADR, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_postal_address_s` s, `rawvault_partnerdata.partner_postal_address_h` h WHERE h.MD_HKEY_POSTAL_ADDRESS_ID = s.MD_HKEY_POSTAL_ADDRESS_ID AND s.ADRNR = 0 AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_POSTAL_ADDRESS_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_post_addr_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Counterparty": {
+      "type": "BQ",
+      "initial_query": "SELECT h.GESCHPARTID, s.PARTID, s.GESCHPARTKLS, s.EROEFFZTPKTGESCHP, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_gesch_partner_s` s, `rawvault_partnerdata.partner_gesch_partner_h` h WHERE h.MD_HKEY_GESCH_PARTNER_ID = s.MD_HKEY_GESCH_PARTNER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_GESCH_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.GESCHPARTID, s.PARTID, s.GESCHPARTKLS, s.EROEFFZTPKTGESCHP, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_gesch_partner_s` s, `rawvault_partnerdata.partner_gesch_partner_h` h WHERE h.MD_HKEY_GESCH_PARTNER_ID = s.MD_HKEY_GESCH_PARTNER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_GESCH_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_counterparty_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Filialkunde": {
+      "type": "BQ",
+      "initial_query": "SELECT h.GESCHPARTID, h.IDLFDNR, s.PARTID , s.FILKDELFDNR, s.FILKDESTOCKREGI, s.GESCHBERMERK, s.Brand, s.Kea, s.MANDANT, s.EROEFFZTPKTFILKDE, s.FILKDESCHLSZTPKT, s.segkss, s.zielgrukss, s.TEILZIELGRUKSS, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_filialkunde_s` s, `rawvault_partnerdata.partner_filialkunde_h` h WHERE h.MD_HKEY_FILIALKUNDE_ID = s.MD_HKEY_FILIALKUNDE_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_FILIALKUNDE_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.GESCHPARTID, h.IDLFDNR, s.PARTID , s.FILKDELFDNR, s.FILKDESTOCKREGI, s.GESCHBERMERK, s.Brand, s.Kea, s.MANDANT, s.EROEFFZTPKTFILKDE, s.FILKDESCHLSZTPKT, s.segkss, s.zielgrukss, s.TEILZIELGRUKSS, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_filialkunde_s` s, `rawvault_partnerdata.partner_filialkunde_h` h WHERE h.MD_HKEY_FILIALKUNDE_ID = s.MD_HKEY_FILIALKUNDE_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_FILIALKUNDE_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_partner_fkn_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Acct_Manager": {
+      "type": "BQ",
+      "initial_query": "SELECT h.FIL, h.BETREUNR , h.NIEDLNR, h.EINSZBER, s.ERTRAGSTELLE, s.MANDANT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_account_manager_s` s, `rawvault_partnerdata.partner_account_manager_h` h WHERE h.MD_HKEY_ACCOUNT_MANAGER_ID = s.MD_HKEY_ACCOUNT_MANAGER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_ACCOUNT_MANAGER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.FIL, h.BETREUNR , h.NIEDLNR, h.EINSZBER, s.ERTRAGSTELLE, s.MANDANT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_account_manager_s` s, `rawvault_partnerdata.partner_account_manager_h` h WHERE h.MD_HKEY_ACCOUNT_MANAGER_ID = s.MD_HKEY_ACCOUNT_MANAGER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_ACCOUNT_MANAGER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_partner_Acct_Mngr_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Cust_Support": {
+      "type": "BQ",
+      "initial_query": "SELECT h.GESCHPARTID, h.IDLFDNR, h.BETREUEINHID, s.BETREU, s.BETREUART, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 2,2) AS INTEGER ) as Cast_EINSZBER, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 4,2) AS INTEGER ) AS CAST_BETREUNR, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 6,3) AS INTEGER ) AS CAST_FIL, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 9,3) AS INTEGER ) AS CAST_NIEDLNR, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_customer_support_s` s, `rawvault_partnerdata.partner_customer_support_h` h WHERE h.MD_HKEY_CUSTOMER_SUPPORT_ID = s.MD_HKEY_CUSTOMER_SUPPORT_ID AND s.BETREUART = 2 AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_CUSTOMER_SUPPORT_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.GESCHPARTID, h.IDLFDNR, h.BETREUEINHID, s.BETREU, s.BETREUART, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 2,2) AS INTEGER ) as Cast_EINSZBER, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 4,2) AS INTEGER ) AS CAST_BETREUNR, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 6,3) AS INTEGER ) AS CAST_FIL, CAST(substr(LPAD(CAST(s.BETREU AS STRING),13, '0'), 9,3) AS INTEGER ) AS CAST_NIEDLNR, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_customer_support_s` s, `rawvault_partnerdata.partner_customer_support_h` h WHERE h.MD_HKEY_CUSTOMER_SUPPORT_ID = s.MD_HKEY_CUSTOMER_SUPPORT_ID AND s.BETREUART = 2 AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_CUSTOMER_SUPPORT_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_partner_Cust_Supp_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    },
+    "Partner_Industry": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, s.BRAZUORDBRAGRU, s.BRAZUORDBRA, s.BRAPROZ, s.HPTBRA, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_branch_classification_s` s, `rawvault_partnerdata.partner_branch_classification_h` h WHERE h.MD_HKEY_BRANCH_CLASSIFICATION_ID = s.MD_HKEY_BRANCH_CLASSIFICATION_ID AND s.HPTBRA=1 AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_BRANCH_CLASSIFICATION_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, s.BRAZUORDBRAGRU, s.BRAZUORDBRA, s.BRAPROZ, s.HPTBRA, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_branch_classification_s` s, `rawvault_partnerdata.partner_branch_classification_h` h WHERE h.MD_HKEY_BRANCH_CLASSIFICATION_ID = s.MD_HKEY_BRANCH_CLASSIFICATION_ID AND s.HPTBRA=1 AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_BRANCH_CLASSIFICATION_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_partner_Industry_stg",
+      "static_metadata_fields": [
+        "book_date",
+        "load_date",
+        "load_user",
+        "load_type"
+      ]
+    }
+  },
+  "loadStrategy": {
+    "load": "Yes",
+    "load_type": "{{load_type}}",
+    "partition": {
+      "enabled": "Yes",
+      "partition_by": "{{book_date}}"
+    }
+  }
+}

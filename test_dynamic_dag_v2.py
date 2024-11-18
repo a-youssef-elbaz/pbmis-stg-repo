@@ -17,6 +17,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
     DataprocDeleteClusterOperator
 )
 import json_parser_v2
+import pbmis_daily_utils as utils
 
 # Example usage
 project_id = "target-project-439512"
@@ -108,9 +109,9 @@ with DAG(
     )
 
     # Parsing config and creating tasks within DAG context
-    config = json_parser_v2.read_config("partnerData_config.json",
+    config = utils.read_json_config("partnerData_config.json",
                                      "gs://europe-west3-pbmis-composer-e4c6b450-bucket/config")
-    job_list = json_parser_v2.parse_json(config, "delta")
+    job_list = utils.parse_json(config, load_type="delta", prev_wrk_dt="2020-01-01")
 
     # Initialize a list to store task groups
     task_groups = []

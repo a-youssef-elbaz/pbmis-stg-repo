@@ -1,0 +1,44 @@
+{
+  "process_Info": {
+    "process_descr": "misDaily",
+    "source_system": "PartnerData",
+    "tenant_process": "mis-partner-stage",
+    "version": "1.0.0"
+  },
+  "feedEntities": {
+    "Partner_Info": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, s.MANDANT, s.EROEFFZTPKTPART, s.PARTKLS, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_partner_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, s.MANDANT, s.EROEFFZTPKTPART, s.PARTKLS, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_partner_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_partner_stg",
+	  "partition_enabled": "Yes",
+	  "partition_columns": ["md_book_date"],
+	  "cluster_enabled": "Yes",
+	  "cluster_columns": ["PARTID", "md_book_date"],
+      "static_metadata_fields": [
+        "md_book_date",
+        "md_load_date",
+        "md_load_user",
+        "md_load_type"
+      ]
+    },
+    "Partner_Natural_Person": {
+      "type": "BQ",
+      "initial_query": "SELECT h.PARTID, s.MANDANT, s.STANG, s.GEBDAT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_natural_partner_person_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND sys_start IS NOT NULL QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "delta_query": "SELECT h.PARTID, s.MANDANT, s.STANG, s.GEBDAT, s.TSAEND, s.SYS_START, s.SYS_END, s.MD_HDIFF_ATTRIBUTES FROM `rawvault_partnerdata.partner_natural_partner_person_s` s, `rawvault_partnerdata.partner_partner_h` h WHERE h.MD_HKEY_PARTNER_ID = s.MD_HKEY_PARTNER_ID AND s.TSAEND > '{{Prev_Working_date}}' QUALIFY ROW_NUMBER() OVER (PARTITION BY (h.MD_HKEY_PARTNER_ID) ORDER BY s.TSAEND, s.sys_start, s.sys_end DESC) = 1",
+      "target_dataset": "misdaily_partnerdata",
+      "target_tableName": "t_pbmis_natural_person_stg",
+	  "partition_enabled": "Yes",
+	  "partition_columns": ["md_book_date"],
+	  "cluster_enabled": "Yes",
+	  "cluster_columns": ["PARTID", "md_book_date"],
+      "static_metadata_fields": [
+        "md_book_date",
+        "md_load_date",
+        "md_load_user",
+        "md_load_type"
+      ]
+    }
+ }
+}

@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s')
 
-def read_config(config_file_nm, storage_location):
+def read_json_config(config_file_nm, storage_location):
     logging.info(f"Storage Location : {storage_location}")
 
     try:
@@ -61,11 +61,22 @@ def parse_json(json_config, load_type, prev_wrk_dt):
 
             # render sql query .. replacing placeholders with actual values
             extraction_query = render_sql_query(qry=extraction_query, parameters={'Prev_Working_date': prev_wrk_dt})
-            #extraction_query = render_sql_query(qry=extraction_query, parameters={'Prev_Working_date': '2023-10-01'})
 
+            # Extract Partitioning & clustering configurations
+            partition_enabled = feed_item.get('partition_enabled', 'No')
+            partition_columns = feed_item.get('partition_columns', [])
+            cluster_enabled = feed_item.get('cluster_enabled', 'No')
+            cluster_columns = feed_item.get('cluster_columns', [])
+            # Converting lists to strings for command-line arguments
+            partition_columns_str = ','.join(partition_columns)
+            cluster_columns_str = ','.join(cluster_columns)
 
             logging.info(f"Extraction Query: {extraction_query}")
             logging.info(f"Target table : {target_dataset}'.'{target_tablename}")
+            logging.info(f"Partition Enabled: {partition_enabled}")
+            logging.info(f"Partition Columns: {partition_columns}")
+            logging.info(f"Cluster Enabled: {cluster_enabled}")
+            logging.info(f"Cluster Columns: {cluster_columns}")
 
             # process metadata
             metadata = {
@@ -81,9 +92,14 @@ def parse_json(json_config, load_type, prev_wrk_dt):
                 "jar_file_uris": ["gs://db-dev-europe-west3-gcs-144024-pbmis-dataproc-codebase-ahmed/jars/spark-bigquery-with-dependencies_2.12-0.34.0.jar"],
                 "main_python_file_uri": "gs://db-dev-europe-west3-gcs-144024-pbmis-dataproc-codebase-ahmed/pbmis-utils/src/poc_ingest_rdp.py",
                 "args": {
+                    "--process_feed": source_system + '_' + source_system + '_' + feed_entity_name,
                     "--src_qry":  extraction_query,
                     "--trgt": target_dataset + '.' + target_tablename,
-                    "--load_typ": load_type
+                    "--load_typ": load_type,
+                    "--partition_enabled": partition_enabled,
+                    "--partition_columns": partition_columns_str,
+                    "--cluster_enabled": cluster_enabled,
+                    "--cluster_columns": cluster_columns_str
                 }
             }
             job_list.append({"job_config": job_config, "metadata": metadata})
@@ -107,7 +123,7 @@ def render_sql_query(qry=None, parameters=None):
 #service_account_key = "C:/Users/ahmed/Downloads/Source_GCS.json"
 # Set the environment variable in Python
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key
-#config = read_config("partnerData_config.json", "gs://bank_dataset_1/config/data-extraction")
+#config = read_json_config("partnerData_config.json", "gs://bank_dataset_1/config/data-extraction")
 #parse_json(config, "delta")
 #logging.info(f"Config content: {config}")
 

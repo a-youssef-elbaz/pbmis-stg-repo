@@ -13,17 +13,6 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-# Mapping BigQuery types to PySpark types
-BIGQUERY_TO_PYSPARK_TYPE_MAP = {
-    'STRING': StringType,
-    'INTEGER': IntegerType,
-    'FLOAT': FloatType,
-    'BOOLEAN': BooleanType,
-    'DATE': DateType,
-    'TIMESTAMP': TimestampType,
-    'NUMERIC': DecimalType
-    # Add more type mappings as necessary
-}
 
 def validate_schema(df, dataset_id, table_id, project_id=None):
     """
@@ -40,6 +29,17 @@ def validate_schema(df, dataset_id, table_id, project_id=None):
     """
     logging.info(f"Starting Schema Validation of DataFrame against BigQuery table {dataset_id}.{table_id}")
 
+    # Mapping BigQuery types to PySpark types
+    BIGQUERY_TO_PYSPARK_TYPE_MAP = {
+        'STRING': StringType,
+        'INTEGER': IntegerType,
+        'FLOAT': FloatType,
+        'BOOLEAN': BooleanType,
+        'DATE': DateType,
+        'TIMESTAMP': TimestampType,
+        'NUMERIC': DecimalType
+        # Add more type mappings as necessary
+    }
     try:
         # Create a BigQuery client & Fetch the target table schema
         if project_id:

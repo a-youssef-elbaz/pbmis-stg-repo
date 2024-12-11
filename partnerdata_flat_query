@@ -1,0 +1,57 @@
+WITH partner_info_current AS (
+SELECT * FROM 
+( 
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY PARTID ORDER BY TSAEND DESC) AS rn
+  FROM partner_info
+) Ranked
+WHERE rn = 1)
+
+,counterparty_current AS (
+SELECT * FROM 
+(
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY counterparty_id ORDER BY TSAEND DESC) AS rn
+  FROM partner_counterparty
+) Ranked
+ WHERE rn = 1) 
+
+,filalkunde_current AS (
+SELECT * FROM 
+(
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY counterparty_id, sequence_no ORDER BY TSAEND DESC) AS rn
+  FROM partner_filalkunde
+) Ranked
+WHERE rn = 1)
+
+,cust_support_current AS (
+SELECT * FROM 
+(
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY counterparty_id, sequence_no, BETREUEINHID ORDER BY TSAEND DESC) AS rn
+  FROM partner_cust_support
+) Ranked
+WHERE rn = 1)
+
+,acct_manager_current AS (
+SELECT * FROM 
+(
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY branch, acct_mngr_id, acct_mngr_dept_id, acct_mngr_area ORDER BY TSAEND DESC) AS rn
+  FROM partner_cust_support
+) Ranked
+WHERE rn = 1)
+
+
+select * from partner_info_current partner_info 
+left join 
+counterparty_current partner_counterparty
+on partner_info.PARTID = partner_counterparty.PARTID
+left join 
+filalkunde_current partner_filalkunde
+on partner_filalkunde.PARTID = partner_info.PARTID  AND partner_filalkunde.counterparty_id = partner_counterparty.counterparty_id
+left join 
+cust_support_current partner_cust_support
+on partner_filalkunde.counterparty_id = partner_cust_support.counterparty_id  AND partner_filalkunde.sequence_no = partner_cust_support.sequence_no
+left join 
+acct_manager_current partner_acct_manager
+on partner_acct_manager.branch             = partner_cust_support.substr(acct_mngr_unit_id, 2,2)
+AND partner_acct_manager.acct_mngr_id      = partner_cust_support.substr(acct_mngr_unit_id, 4,2)
+AND partner_acct_manager.acct_mngr_dept_id = partner_cust_support.substr(acct_mngr_unit_id, 6,3)
+AND partner_acct_manager.acct_mngr_area    = partner_cust_support.substr(acct_mngr_unit_id, 9,3)
